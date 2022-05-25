@@ -1,6 +1,7 @@
-/*import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -9,24 +10,21 @@ export class UserServiceService {
   private baseUrl = 'http://localhost:8080/users';
 
   constructor(private http: HttpClient) { }
-  getUser(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/${id}`);
-  }
+
   getUserById(id:number):Observable<any>{
-    return this.http.get(`${this.baseUrl}/${id}`);
+    return this.http.get(`${environment.endpoint}/${id}`);
   }
   createUser(user: Object): Observable<any> {
-    return this.http.post(`${this.baseUrl}`, user);
+    return this.http.post(`${environment.endpoint}/register`, user);
   }
   getUsersList(): Observable<any> {
-    return this.http.get(`${this.baseUrl}`);
+    return this.http.get(`${environment.endpoint}`);
   }
   deleteUser(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`, { responseType: 'text' });
+    return this.http.delete(`${environment.endpoint}/delete/${id}`, { responseType: 'text' });
   }
   updateUser(id: number, value: any): Observable<Object> {
-    return this.http.put(`${this.baseUrl}/${id}`, value);
+    return this.http.put(`${environment.endpoint}/${id}`, value);
   }
  
 }
-*/

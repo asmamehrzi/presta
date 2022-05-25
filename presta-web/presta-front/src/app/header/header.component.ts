@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { SocialAuthService } from 'angularx-social-login';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -19,6 +20,7 @@ export class HeaderComponent implements OnInit {
         this.user = data;
       }
     );
+   
   }
   toggleSidebar() {
     this.toggleSidebarForMe.emit();

@@ -3,11 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FacebookLoginProvider, GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
-import { first } from 'rxjs';
-import { AuthLoginInfo } from '../model/login-info';
+import { AuthInterceptor } from '../interceptors/auth.interceptor';
 import { AuthService } from '../services/auth.service';
-import { TokenStorageService } from '../token/token-storage.service';
-
+import {UserServiceService} from '../user-service.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -16,25 +14,25 @@ import { TokenStorageService } from '../token/token-storage.service';
 })
 export class SignUpComponent implements OnInit{
   user!: any;
-  errorMessage='';
-  isLoginFailed=false;
   isLogin!: boolean; // false
+  responseData:any;
   loginForm: FormGroup=this.formBuilder.group({
     username: ['', Validators.required],
     password: ['', Validators.required],
   })
   constructor(private formBuilder: FormBuilder,private http:HttpClient,private router:Router,private authService: SocialAuthService
-    ,private authservice: AuthService, private tokenStorage:    TokenStorageService) { }
+    ,private authservice: AuthService,private userservice:UserServiceService) { }
   ngOnInit(): void {
     this.authService.authState.subscribe(
       data => {
+        this.isLogin = (data != null);
         this.user=data;
 
       }
     );
+   
+    }
     
-  
-  }
 
   signInWithGoogle(): void {
     this.authService.signIn(GoogleLoginProvider.PROVIDER_ID).then(
@@ -56,9 +54,9 @@ export class SignUpComponent implements OnInit{
   signOut(): void {
     this.authService.signOut();
   }
-  
-   /*login(){
-      this.userService.getUsersList()
+  /*
+   login(){
+      this.userservice.getUsersList()
       .subscribe(res=>{
         const user=res.find((a:any)=>{
           return a.username===this.loginForm.value.username && a.password===this.loginForm.value.password
@@ -74,20 +72,36 @@ export class SignUpComponent implements OnInit{
         alert("erreur")
       })
     }*/
- onSubmit(){
-   this.authservice.login(this.loginForm.value.username,this.loginForm.value.password)
-  . pipe(first()).subscribe(
-     (data: any) =>{
-       this.isLoginFailed=false;
-       this.router.navigate(['dashboard'])
-      },(Error: any)=>{
-        alert("erreur");
-        this.isLoginFailed=true;
 
-      })
- }
+    submit(): void {
+      if(this.loginForm.valid){
+      this.authservice.login(this.loginForm.value).
+      subscribe(result=>{
+        if(result!=null){
+          console.log(result);
+          AuthInterceptor.accessToken=result.accesstoken;
+          localStorage.setItem('token',result.accesstoken);
+          this.router.navigate(['dashboard']);
   
-      }
+        }});
+      
+        }
+        }
+}
+     /*  this.invalidLogin=false;
+       this.loginSuccess=true;
+       this.successMessage='Login successful';
+       this.router.navigate(['dashboard']);
+       
+      }, ()=>{
+        alert("erreur");
+        this.invalidLogin=true;
+        this.loginSuccess=false;
+
+      });*/
+ 
+  
 
 
-
+ 
+ 

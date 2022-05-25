@@ -23,7 +23,7 @@ import { HomeComponent } from './home/home.component';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { RegisterComponent } from './register/register.component';
-import {HttpClientModule } from '@angular/common/http';
+import {HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { DashboardUserComponent } from './dashboard-user/dashboard-user.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
@@ -35,7 +35,7 @@ import { SocialLoginModule, SocialAuthServiceConfig } from 'angularx-social-logi
 import {GoogleLoginProvider,FacebookLoginProvider} from 'angularx-social-login';
 import type { ThemePalette } from '@angular/material/core/common-behaviors/color';
 import { AuthService } from './services/auth.service';
-import { JwtModule } from '@auth0/angular-jwt';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 
 @NgModule({
@@ -83,12 +83,18 @@ import { JwtModule } from '@auth0/angular-jwt';
     
   ],
   
-  providers: [{
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    },
+    
+    {
     provide: 'SocialAuthServiceConfig',
     useValue: {
       autoLogin: false,
       providers: [
-        AuthService,
         {
           id: GoogleLoginProvider.PROVIDER_ID,
           provider: new GoogleLoginProvider(
